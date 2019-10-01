@@ -130,9 +130,9 @@ prompt> ./sifs_put myfilename-today
 ### Notes ###
 
 * To develop a portable file-system format, a number of data-types are used that may be new to some students:
-  uint32_t - a non-negative 32-bit integer, used to count things.
-  size_t - a non-negative 64-bit integer, representing the size (in bytes) of things, as returned by the strlen() function. 
-  time_t - a 64-bit integer, representing the number of seconds since Jan 1st 1970, as returned by the time() function.
+>* uint32_t - a non-negative 32-bit integer, used to count things.
+>* size_t - a non-negative 64-bit integer, representing the size (in bytes) of things, as returned by the strlen() function. 
+>* time_t - a 64-bit integer, representing the number of seconds since Jan 1st 1970, as returned by the time() function.
 
 * API functions that receive character strings as parameters define those parameters with const char *
 const is a C99 keyword, short for constant, and is used here when a function promises not to modify what its parameter points to.
