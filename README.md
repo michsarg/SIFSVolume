@@ -1,6 +1,5 @@
-```
-Department of Computer Science and Software Engineering
-```
+#### Department of Computer Science and Software Engineering ####
+
 # CITS2002 Systems Programming #
 
 ## Project 2 2019. See also: [Project 2 clarification](http://teaching.csse.uwa.edu.au/units/CITS2002/projects/project2-clarifications.php) ##
@@ -31,14 +30,18 @@ Our SIFS volumes are of a fixed size - once created they can neither grow nor sh
 
 3. Each block stores either a directory-block, a file-block, a data-block (holding files' contents), or is unused.
 
-* Directory-blocks have a fixed format.
->Each includes the name of the directory and its modification time; the number of entries in the directory (either subdirectories or files); and, for each entry, the block number (blockID) of each subdirectory or file.
+* Directory-blocks have a fixed format. Each includes:
+>* the name of the directory and its modification time; 
+>* the number of entries in the directory (either subdirectories or files); 
+>* and, for each entry, the block number (blockID) of each subdirectory or file.
 
-* File-blocks have a fixed format.
->Each includes an array of characters storing the MD5 cryptographic digest (a summary) of the files' contents; the common length (in bytes) of every file represented by that file-block; the block number (blockID) of the files' first data-block; the number of files having the same contents; and an array of each such file's name and its modification time.
+* File-blocks have a fixed format. Each inclues:
+>* an array of characters storing the MD5 cryptographic digest (a summary) of the files' contents; 
+>* the common length (in bytes) of every file represented by that file-block; the block number (blockID) of the files' first data-block; 
+>* the number of files having the same contents; and an array of each such file's name and its modification time.
 
 * Data-blocks have no fixed format.
- >They hold only files' contents, and no characters in a data-block have any special significance. A first-fit, contiguous data-block allocation scheme is employed - see Lecture-18. A new file can only be added to the volume if there are sufficient contiguous unused blocks to support the file's length, or if other file(s) with the same contents have already been stored.
+⋅⋅* They hold only files' contents, and no characters in a data-block have any special significance. A first-fit, contiguous data-block allocation scheme is employed - see Lecture-18. A new file can only be added to the volume if there are sufficient contiguous unused blocks to support the file's length, or if other file(s) with the same contents have already been stored.
 
 - - - - 
 
