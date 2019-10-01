@@ -35,13 +35,13 @@ Our SIFS volumes are of a fixed size - once created they can neither grow nor sh
 >* the number of entries in the directory (either subdirectories or files); 
 >* and, for each entry, the block number (blockID) of each subdirectory or file.
 
-* File-blocks have a fixed format. Each inclues:
+* File-blocks have a fixed format. Each includes:
 >* an array of characters storing the MD5 cryptographic digest (a summary) of the files' contents; 
 >* the common length (in bytes) of every file represented by that file-block; the block number (blockID) of the files' first data-block; 
 >* the number of files having the same contents; and an array of each such file's name and its modification time.
 
 * Data-blocks have no fixed format.
-⋅⋅* They hold only files' contents, and no characters in a data-block have any special significance. A first-fit, contiguous data-block allocation scheme is employed - see Lecture-18. A new file can only be added to the volume if there are sufficient contiguous unused blocks to support the file's length, or if other file(s) with the same contents have already been stored.
+>* They hold only files' contents, and no characters in a data-block have any special significance. A first-fit, contiguous data-block allocation scheme is employed - see [Lecture-18](http://teaching.csse.uwa.edu.au/units/CITS2002/lectures/lecture18/singlepage.html). A new file can only be added to the volume if there are sufficient contiguous unused blocks to support the file's length, or if other file(s) with the same contents have already been stored.
 
 - - - - 
 
