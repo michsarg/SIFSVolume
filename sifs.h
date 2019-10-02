@@ -41,20 +41,21 @@ extern	int SIFS_fileinfo(const char *volumename, const char *pathname,
 //  ON FAILURE, EACH FUNCTION RETURNS 1 AND SETS SIFS_errno
 extern	int		SIFS_errno;
 
-#define	SIFS_EOK	0
-#define	SIFS_EINVAL	1	// Invalid argument
+#define	SIFS_EOK		0
+#define	SIFS_EINVAL		1	// Invalid argument
 #define	SIFS_ECREATE	2	// Cannot create volume
-#define	SIFS_ENOVOL	3	// No such volume
-#define	SIFS_ENOENT	4	// No such file or directory entry
-#define	SIFS_EEXIST	5	// Volume, file or directory already exists
+#define	SIFS_ENOVOL		3	// No such volume
+#define	SIFS_ENOENT		4	// No such file or directory entry
+#define	SIFS_EEXIST		5	// Volume, file or directory already exists
 #define	SIFS_ENOTVOL	6	// Not a volume
 #define	SIFS_ENOTDIR	7	// Not a directory
 #define	SIFS_ENOTFILE	8	// Not a file
 #define	SIFS_EMAXENTRY	9	// Too many directory or file entries
-#define	SIFS_ENOSPC	10	// No space left on volume
-#define	SIFS_ENOMEM	11	// Memory allocation failed
+#define	SIFS_ENOSPC		10	// No space left on volume
+#define	SIFS_ENOMEM		11	// Memory allocation failed
 #define	SIFS_ENOTYET	12	// Not yet implemented
 #define	SIFS_ENOTEMPTY	13	// Directory is not empty
+#define SIFS_ENAMELEN	14	// File or directory name out of range 
 
 
 //  THE FUNCTION SIFS_perror() PRODUCES A MESSAGE ON THE STANDARD ERROR OUTPUT,

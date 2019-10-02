@@ -4,20 +4,21 @@
 int	SIFS_errno	= SIFS_EOK;
 
 char	*SIFS_errlist[] = {
-	"OK",						// SIFS_EOK
-	"Invalid argument",				// SIFS_EINVAL
-	"Cannot create volume",				// SIFS_ECREATE
-	"No such volume",				// SIFS_ENOVOL
-	"No such file or directory entry",		// SIFS_ENOENT
+	"OK",										// SIFS_EOK
+	"Invalid argument",							// SIFS_EINVAL
+	"Cannot create volume",						// SIFS_ECREATE
+	"No such volume",							// SIFS_ENOVOL
+	"No such file or directory entry",			// SIFS_ENOENT
 	"Volume, file or directory already exists",	// SIFS_EEXIST
-	"Not a volume",					// SIFS_ENOTVOL
-	"Not a directory",				// SIFS_ENOTDIR
-	"Not a file",					// SIFS_ENOTFILE
+	"Not a volume",								// SIFS_ENOTVOL
+	"Not a directory",							// SIFS_ENOTDIR
+	"Not a file",								// SIFS_ENOTFILE
 	"Too many directory or file entries",		// SIFS_EMAXENTRY
-	"No space left on volume",			// SIFS_ENOSPC
-	"Memory allocation failed",			// SIFS_ENOMEM
-        "Not yet implemented",                          // SIFS_ENOTYET
-	"Directory is not empty",			// SIFS_ENOTEMPTY
+	"No space left on volume",					// SIFS_ENOSPC
+	"Memory allocation failed",					// SIFS_ENOMEM
+    "Not yet implemented",              		// SIFS_ENOTYET
+	"Directory is not empty",					// SIFS_ENOTEMPTY
+	"Name length incorrect"						// SIFS_ENAMELEN
 };
 
 #define	SIFS_NERRS	(sizeof(SIFS_errlist) / sizeof(SIFS_errlist[0]))
