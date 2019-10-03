@@ -13,22 +13,23 @@ void usage(char *progname)
 
 int main(int argcount, char *argvalue[])
 {
+    char *volumename;
+    char *dirname;
+
 //  OBTAIN volumename AND dirname FROM PARAMETERS    
     if (argcount == 3) {
-    volumename = argvalue[1] 
+    volumename = argvalue[1]; 
     dirname = argvalue[2];
     }
     if (volumename == NULL || dirname == NULL) {
+    printf("error1\n");
     usage(argvalue[0]);
     exit(EXIT_FAILURE);    
-    }
-    else {
-    usage(argvalue[0]);
-    exit(EXIT_FAILURE);
     }
 
 //  ATTEMPT TO CREATE THE NEW DIRECTORY
     if(SIFS_mkdir(volumename, dirname) != 0) {
+    printf("error2\n");
 	SIFS_perror(argvalue[0]);
 	exit(EXIT_FAILURE);
     }

@@ -31,9 +31,9 @@ typedef struct {
 
     uint32_t		nentries;
     struct {
-	SIFS_BLOCKID	blockID;	// of the entry's subdirectory or file
-	uint32_t	fileindex;	// into a SIFS_FILEBLOCK's filenames[]
-    } entries[SIFS_MAX_ENTRIES];
+    	SIFS_BLOCKID	blockID;	// of the entry's subdirectory or file
+    	uint32_t	fileindex;	// into a SIFS_FILEBLOCK's filenames[]
+        } entries[SIFS_MAX_ENTRIES];
 } SIFS_DIRBLOCK;
 
 //  DEFINITION OF EACH FILE BLOCK - MUST FIT INSIDE A SINGLE BLOCK
