@@ -11,20 +11,21 @@ void usage(char *progname)
     exit(EXIT_FAILURE);
 }
 
+
+
 int main(int argcount, char *argvalue[])
 {
     char *volumename;
     char *dirname;
-
+    printf("error0\n");
 //  OBTAIN volumename AND dirname FROM PARAMETERS    
     if (argcount == 3) {
     volumename = argvalue[1]; 
     dirname = argvalue[2];
-    }
-    if (volumename == NULL || dirname == NULL) {
-    printf("error1\n");
+    }     
+    else {
     usage(argvalue[0]);
-    exit(EXIT_FAILURE);    
+    exit(EXIT_FAILURE);
     }
 
 //  ATTEMPT TO CREATE THE NEW DIRECTORY
@@ -33,7 +34,7 @@ int main(int argcount, char *argvalue[])
 	SIFS_perror(argvalue[0]);
 	exit(EXIT_FAILURE);
     }
-
+    printf("existsuccess\n");
     return EXIT_SUCCESS;
 }
 
