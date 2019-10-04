@@ -17,7 +17,7 @@ int main(int argcount, char *argvalue[])
 {
     char *volumename;
     char *dirname;
-    printf("error0\n");
+
 //  OBTAIN volumename AND dirname FROM PARAMETERS    
     if (argcount == 3) {
     volumename = argvalue[1]; 

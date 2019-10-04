@@ -8,69 +8,107 @@
 void test (int number) {
 	printf("test %i\n", number);
 }
-// make a new directory within an existing volume
+
+
 int SIFS_mkdir(const char *volumename, const char *dirname)
 {
 
-	/*
-	// ENSURE THAT RECEIVED PARAMETERS ARE VALID
-
-		//check existence of volume
-	        if(access(volumename, F_OK) != 0) {
-				SIFS_errno	= SIFS_ENOVOL;
-				return 1;
-	    }
-		// check proposed foldername length
-			if((strlen(dirname)+1) > SIFS_MAX_NAME_LENGTH) {
-				SIFS_errno	= SIFS_ENAMELEN;
-				return 1;
-	    }
-	*/
-
-	// ENSURE THAT REQUESTED DIRECTORY DOES NOT ALREADY EXIST
-	test(1);
-	// check bitmap for directory blocks
 	// open volume for writing
-	FILE *vol = fopen(volumename, "w");
-	test(2);
+	FILE *fp = fopen(volumename, "r"); // opens file reading and writing
 
-	/* 
-	// check if other directory blocks have same directory name already
-    for(int b=1 ; b<nblocks ; ++b) {
-    	//find directory block
-        if (bitmap[b] == SIFS_DIR) {
-        	// check for same name
-        	if (strcmp(dirname, SIFS_DIRBLOCK.name) != 1) {  //not right for accessing names
-        		// exit with error if same named directory exists
-        		SIFS_errno = SIFS_EEXIST; 
-        		return 1;
-        	}
-        }
+	//copy blocksize and nblocks locally
+	SIFS_VOLUME_HEADER header;
+	fread(&header, sizeof header, 1, fp);
+	int blocksize;
+	blocksize = header.blocksize;
+	int nblocks;
+	nblocks = header.nblocks;
+		printf("blocksize: %i\n", blocksize);
+		printf("nblocks: %i\n", nblocks);
+
+	//copy bitmap locally and edit
+	SIFS_BIT bitmap[nblocks];
+	fread(bitmap, sizeof bitmap, 1, fp);
+	memcpy(bitmap, bitmap, sizeof bitmap);
+		printf("bitmap[0] = %c\n", bitmap[0]);
+		printf("bitmap[1] = %c\n", bitmap[1]);
+		printf("bitmap[2] = %c\n", bitmap[2]);
+	//find location of first unused block in bitmap
+	int bid = 1;
+	while (bitmap[bid] != SIFS_UNUSED) {
+		++bid;
+	}
+	bitmap[bid] = SIFS_DIR;
+		printf("bitmap[0] = %c\n", bitmap[0]);
+		printf("bitmap[1] = %c\n", bitmap[1]);
+		printf("bitmap[2] = %c\n", bitmap[2]);
+	//write bitmap back to volume
+	fseek(fp, sizeof header, SEEK_SET);
+	fwrite(bitmap, sizeof bitmap, 1, fp);
+
+	//create dirblock
+	SIFS_DIRBLOCK dir_block;
+	strcpy(dir_block.name, dirname);
+	dir_block.modtime = time(NULL);
+	dir_block.nentries = 0;
+	//copy dir_block to oneblock 
+	char	oneblock[blocksize];
+    memset(oneblock, 0, sizeof oneblock);        // cleared to all zeroes
+    memcpy(oneblock, &dir_block, sizeof dir_block);
+    //seek location and write dir_block
+    long offset = sizeof header + sizeof bitmap + ((sizeof oneblock) * bid);
+    fseek(fp, offset, SEEK_SET);
+    fwrite(oneblock, sizeof oneblock, 1, fp);
+
+    //update rootdir_block
+    SIFS_DIRBLOCK	rootdir_block;
+    memset(oneblock, 0, sizeof oneblock);        // cleared to all zeroes
+    memcpy(oneblock, &rootdir_block, sizeof rootdir_block);
+    rootdir_block.modtime	= time(NULL);
+    rootdir_block.nentries += 1; // CHECK THIS
+    //find next unused entry
+    	printf("rootdir_block.entries[0].blockID = %i\n", rootdir_block.entries[0].blockID);
+    	printf("rootdir_block.nentries = %i\n", rootdir_block.nentries);
+    int entrycount = 0;
+    while (rootdir_block.entries[entrycount].blockID != '\0'){
+    	++entrycount;
     }
-	*/
+    rootdir_block.entries[entrycount].blockID = bid;  // CHECK THIS
+    rootdir_block.entries[entrycount].fileindex = 0;  // CHECK THIS
+    		printf("entcount = %i\n", entrycount);
+        	printf("rootdir_block.entries[0].blockID = %i\n", rootdir_block.entries[0].blockID);
+        	printf("rootdir_block.entries[1].blockID = %i\n", rootdir_block.entries[1].blockID);
+        	printf("rootdir_block.entries[2].blockID = %i\n", rootdir_block.entries[2].blockID);
+    fseek(fp, (sizeof header + sizeof bitmap), SEEK_SET);
+    fwrite(oneblock, sizeof oneblock, 1, fp);
 
-	// ATTEMPT TO CREATE THE NEW DIRECTORY - OPEN VOLUME FOR WRITING
-	// use bitmap to find first free block (directory block is 1 block)
-	
+
+
+
+
+
+
+
 	/*
+	//blanked from open to close
+	//read from header and bitmap
+	SIFS_VOLUME_HEADER  header;
+    fread(&header, sizeof header, 1, fp);
+    printf("blocksize=%i,  nblocks=%i\n",  
+    	(int)header.blocksize, (int)header.nblocks);
+
+	// need to set vol to the bitmap location
+	SIFS_BIT	bitmap[header.nblocks];
+	fread(bitmap, sizeof bitmap, 1, fp);
+
+	//search the bitmap for unused
 	uint32_t bid = 0;
 	while (bitmap[bid] != SIFS_UNUSED) {
 		++bid;
 		}
 
-	// 	UPDATE THE BITMAP
-	bitmap[bid] = SIFS_DIR;
-	*/
-	// UPDATE THE ROOT DIRECORY
-	// how?
-
-	//read from header and bitmap
-	SIFS_VOLUME_HEADER  header;
-	fread(&header, sizeof header, 1, vol);
-	SIFS_BIT	bitmap[header.nblocks];
-	fread(&bitmap, sizeof bitmap, 1, vol);
-
-	test(3);
+	//update the volume header
+	fwrite(bitmap, sizeof bitmap, 1, fp);
 
 	// DEFINE AND INTIALISE VARIABLES FOR DIRECTORY BLOCK
 	size_t blocksize = header.blocksize;
@@ -86,24 +124,21 @@ int SIFS_mkdir(const char *volumename, const char *dirname)
     memcpy(oneblock, &dir_block, sizeof dir_block);
     
     // SEEK THE CORRECT LOCATION
-    long offset = ((sizeof header + sizeof bitmap) + ((sizeof oneblock) * 1));
-    fseek(vol, offset, SEEK_SET);
+    long offset = ((sizeof header + sizeof bitmap) + ((sizeof oneblock) * bid));
+    fseek(fp, offset, SEEK_SET);
     
     // WRITE THE DIR BLOCK TO THE LOCATION
-	fwrite(&dir_block, sizeof dir_block, 1, vol);	// write dir
-
-	// FINISHED, CLOSE THE VOLUME
-	fclose(vol);
-	test(4);
-	/*
-	// DIRECTORY CREATION FAILED
-		// return error message
-    SIFS_errno	= SIFS_ENOTYET;
-    return 1;
+	fwrite(&dir_block, sizeof dir_block, 1, fp);	// write dir
 	*/
+	// FINISHED, CLOSE THE VOLUME
+	fclose(fp);
 
 	// RETURN INDICATING SUCCESS
     return 0;
 
 
+
 }
+
+
+
