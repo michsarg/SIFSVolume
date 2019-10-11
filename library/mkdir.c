@@ -10,6 +10,75 @@ void test (int number) {
 }
 
 
+/*
+SIFS_VOLUME_HEADER read_header (const char *volumename) {
+	FILE *fp = fopen(volumename, "r");
+	fseek(fp, 0, SEEK_SET);
+	SIFS_VOLUME_HEADER header;
+	fread(&header, sizeof header, 1, fp);
+	fclose(fp);
+	return header;
+}
+
+
+void write_header (const char *volumename, SIFS_VOLUME_HEADER header) {
+	FILE *fp = fopen(volumename, "r+");
+	fseek(fp, 0, SEEK_SET);
+	fwrite(&header, sizeof header, 1, fp);
+	fclose(fp);
+}
+
+
+SIFS_BIT * read_bitmap (const char *volumename) {
+	FILE *fp = fopen(volumename, "r");
+	SIFS_VOLUME_HEADER header = read_header(volumename);
+	int nblocks = header.nblocks;
+	fseek(fp, sizeof header, SEEK_SET);
+	SIFS_BIT bitmap[nblocks];
+	fread(bitmap, sizeof bitmap, 1, fp);
+	fclose(fp);
+	return &bitmap;
+}
+
+
+void write_bitmap (const char *volumename, *bitmap) {
+	FILE *fp = fopen(volumename, "r+");
+	SIFS_VOLUME_HEADER header = read_header(volumename);
+	fseek(fp, sizeof header, SEEK_SET);
+	fwrite(bitmap, sizeof bitmap, 1, fp);
+	fclose(fp);
+}
+
+
+SIFS_DIRBLOCK read_dirblock (const char *volumename, int blockID) {
+	FILE *fp = fopen(volumename, "r");
+	SIFS_VOLUME_HEADER header = read_header(volumename);
+	int nblocks = header.nblocks;
+	int blocksize = header.blocksize;
+	bitmap[SIFS_BIT] = read_bitmap(volumename)
+	char	oneblock[blocksize];
+	SIFS_DIRBLOCK dirblock;
+	fseek(fp, (sizeof header + sizeof bitmap + (sizeof(oneblock) * blockID)), SEEK_SET);
+	fread(&dirblock, sizeof dirblock, 1, fp);
+	fclose(fp);
+	return dirblock;
+}
+
+
+void write_dirblock (const char *volumename, SIFS_DIRBLOCK dirblock, int blockID) {
+	FILE *fp = fopen(volumename, "r+");
+	SIFS_VOLUME_HEADER header = read_header(volumename);
+	int nblocks = header.nblocks;
+	int blocksize = header.blocksize;
+	bitmap[SIFS_BIT] = read_bitmap(volumename)
+	char	oneblock[blocksize];
+	fseek(fp, (sizeof header + sizeof bitmap + (sizeof(oneblock) * blockID)), SEEK_SET);
+	fwrite(&dirblock, sizeof dirblock, 1, fp)
+	fclose(fp);
+}
+*/	 
+
+
 int check_dir_exists(const char *volumename, const int dirblockID, const char *dirname) {
 
 	// open volume for reading
@@ -34,24 +103,24 @@ test(1);
 test(2);
 	// retrieve dirblock by parameter dirblockID
 	fseek(fp, (sizeof header + sizeof bitmap + (sizeof(oneblock) * dirblockID)), SEEK_SET);
-	SIFS_DIRBLOCK sup_dirblock;
-	fread(&sup_dirblock, sizeof sup_dirblock, 1, fp);
+	SIFS_DIRBLOCK parent_dirblock;
+	fread(&parent_dirblock, sizeof parent_dirblock, 1, fp);
 test(3);
-	for (int i = 0; i < sup_dirblock.nentries; ++i) {
+	for (int i = 0; i < parent_dirblock.nentries; ++i) {
 test(4);
 //printf("blockID = %i\n", blockID);
-printf("bitmap[sup_dirblock.entries[%i].blockID] = %c\n", i, bitmap[sup_dirblock.entries[i].blockID]);
+printf("bitmap[parent_dirblock.entries[%i].blockID] = %c\n", i, bitmap[parent_dirblock.entries[i].blockID]);
 
-		if (bitmap[sup_dirblock.entries[i].blockID] == SIFS_DIR) {
+		if (bitmap[parent_dirblock.entries[i].blockID] == SIFS_DIR) {
 test(5);
-			SIFS_DIRBLOCK sub_dirblock;
+			SIFS_DIRBLOCK child_dirblock;
 			fseek(fp, (sizeof header + sizeof bitmap + 
-				(sizeof(oneblock) * sup_dirblock.entries[i].blockID)), SEEK_SET); // check I here
-    		memset(&sub_dirblock, 0, sizeof sub_dirblock);
-    		fread(&sub_dirblock, sizeof(sub_dirblock), 1, fp);
+				(sizeof(oneblock) * parent_dirblock.entries[i].blockID)), SEEK_SET); // check I here
+    		memset(&child_dirblock, 0, sizeof child_dirblock);
+    		fread(&child_dirblock, sizeof(child_dirblock), 1, fp);
 test(6);
-printf("sub_dirblock.name = %s\n", sub_dirblock.name);
-    		if (strcmp(sub_dirblock.name, dirname) == 0 ) {
+printf("child_dirblock.name = %s\n", child_dirblock.name);
+    		if (strcmp(child_dirblock.name, dirname) == 0 ) {
 				//dir found
 				fclose(fp);
 				return 0;
@@ -64,76 +133,6 @@ test(7);
 	fclose(fp);
 	return 1;
 
-
-
-
-
-	//// retard
-	/*
-	test(3);
-	// search for directories in dirblock.entries
-	fseek(fp, sizeof header, SEEK_SET);
-	fread(bitmap, sizeof bitmap, 1, fp);
-	test(4);
-	SIFS_DIRBLOCK	sub_dirblock;	
-	// check bitmap for directories
-	for (int i = 0; i < nblocks; ++i) {
-		if (bitmap[i] == SIFS_DIR && i != dirblockID) {	
-
-			fseek(fp, (sizeof header + sizeof bitmap + (sizeof(oneblock) * i)), SEEK_SET);
-    		memset(&sub_dirblock, 0, sizeof sub_dirblock);
-    		fread(&sub_dirblock, sizeof(sub_dirblock), 1, fp);	//copy that dirblock
-
-    		//check if the file index in entries of sup block matches dirblockID
-    		//if (sup_dirblock.entries[].fileindex == dirblockID) // relation index array to 
-
-	test(5);
-
-	printf("sub_dirblock.name = %s\n", sub_dirblock.name);
-	printf("sub_dirblock.nentries = %i\n", sub_dirblock.nentries); // should be not zero
-	printf("sub_dirblock.entries[0].blockID = %u\n", sub_dirblock.entries[0].blockID);
-	printf("sub_dirblockID = %i\n", dirblockID);
-
-		// still need to check for rootfile match
-		if (strcmp(sub_dirblock.name, dirname) == 0 ) {
-			//dirfound
-			fclose(fp);
-			return 0;
-		}
-
-	
-			// check through the fileindex for match to dirblock ID
-    		for (int i = 0; i < dirblock.nentries; ++i) {	//somethings wrong
-    			if((int)dirblock.entries[i].fileindex == dirblockID) {
-				test(6);
-	    			// check if filename matches
-		    		if (strcmp(dirblock.name, dirname) == 0) {
-					test(7);		    			
-		    			// dir found
-	    				fclose(fp);
-						return 0;
-
-	    			}
-    			}
-    		}
-
-		
-	//}
-	// dir not found
-	//fclose(fp);
-	//return 1;
-
-
-
-	// retreive dirblocks of directories
-	// extract dirblock names
-	// compare dirblock names to proposed dirname
-	// return 0 if success, 1 if fail
-
-
-	//	FINISHED, CLOSE THE VOLUME
-
-	*/
 
 }
 
@@ -173,46 +172,47 @@ int SIFS_mkdir(const char *volumename, const char *dirname)
     //currentdirID = 0;
     token = strtok(str, s);
 
+    int dirtotal = 0;
+    while(token != NULL) {
+	token = strtok(NULL, s);
+	++dirtotal;
+    }
+
+	printf("dirtotal: %i\n", dirtotal);
+
+	int dircount = 0;
     while(token != NULL) {
     	printf( " %s\n", token );
     	token = strtok(NULL, s);
+
+    	//obtain block ID of parent
+    	int parent_blockID;
+    	if (dircount == 0) {
+    		parent_blockID = 0;
+    	} 
+    	else {
+    		///////
+
+    		;
+
+    	}
+
+    	//if (check_dir_exists(volumename, parent_blockID, token) == 0)
+
+
 
     	/*
     	if ((check_dir_exists(currentdirID, token) == 1) {
     		;
     	} 
-		 */  
+		 */
+    	++dircount;
     }
 
 printf("does dir exist: %i\n", check_dir_exists(volumename, 0, dirname) );
 
 
-    	/*
-	int inputlength = strlen(dirname);
-	int dircount = 1;
-	for (int i = 0; i < inputlength; ++i) {
-		if (dirname[i] == '/') {
-			++dircount;
-		}
-	}
-	int dirlevelcount = 0;
-	int dircharcount = 0;
-	char dirlist[dircount][SIFS_MAX_NAME_LENGTH];
-	for (int i = 0; i < inputlength; ++i) {
-		// if char
-		if (dirname[i] != '/') {
-			dirlist[dirlevelcount][dircharcount] = dirname[i];
-			++dircharcount;
-		}
-		// if '/'
-		else if (dirname[i] == '/') {
-			dirlist[dirlevelcount][dircharcount] = '\0';
-			++dirlevelcount;
-			dircharcount = 0;
-		}
-	}
-	dirlist[dirlevelcount][dircharcount] = '\0';
-	*/
+
 
 
 
@@ -247,7 +247,7 @@ printf("does dir exist: %i\n", check_dir_exists(volumename, 0, dirname) );
 	fseek(fp, sizeof header, SEEK_SET);
 	fwrite(bitmap, sizeof bitmap, 1, fp);
 
-// 	CREATE NEW DIR BLOCK
+// 	CREATE NEW DIR BLOCK (child dir)
 	SIFS_DIRBLOCK dir_block;
 	strcpy(dir_block.name, dirname);
 	dir_block.modtime = time(NULL);
@@ -262,7 +262,7 @@ printf("does dir exist: %i\n", check_dir_exists(volumename, 0, dirname) );
     fseek(fp, offset, SEEK_SET);					
     fwrite(oneblock, sizeof oneblock, 1, fp);		
 
-//	UPDATE ROOT DIR BLOCK
+//	UPDATE ROOT DIR BLOCK (parent dir)
     fseek(fp, (sizeof header + sizeof bitmap), SEEK_SET);	
     SIFS_DIRBLOCK dirblock;						
     fread(&dirblock, sizeof dirblock, 1, fp);
